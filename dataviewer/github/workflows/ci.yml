@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Runs when code is pushed to main branch
+      - master  # If your main branch is called master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest  # Use Ubuntu as the runner
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3  # Pulls your code
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18  # Adjust to your project's Node.js version
+
+      - name: Install dependencies
+        run: npm install  # or yarn install
+
+      - name: Run tests
+        run: npm test  # Runs your test suite
+
+      - name: Build application
+        run: npm run build  # Builds your app
