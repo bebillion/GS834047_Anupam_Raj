@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaUserCircle } from "react-icons/fa"; // User icon
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md"; // Arrow icons
 
-const UserDropdown: React.FC = () => {
+const UserDropDown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -28,4 +28,4 @@ const UserDropdown: React.FC = () => {
   );
 };
 
-export default UserDropdown;
+export default UserDropDown;
