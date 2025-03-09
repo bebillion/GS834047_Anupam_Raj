@@ -1,42 +1,31 @@
-name: CI/CD Pipeline
+name: Deploy React App to Netlify
 
 on:
   push:
     branches:
-      - main
-      - master
-  pull_request:
-    branches:
-      - main
-      - master
+      - main  # Change if using a different branch
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20  # Change to your required Node.js version
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install Dependencies
+        run: npm install  # or yarn install
 
-      - name: Run tests
-        run: npm test
-
-      - name: Build application
-        run: npm run build
+      - name: Build React App
+        run: npm run build  # or yarn build
 
       - name: Deploy to Netlify
-        uses: nwtgck/actions-netlify@v2
-        with:
-          publish-dir: "./build"  # Adjust based on your project
-          production-branch: main
-          github-token: ${{ secrets.GH_ACCESS_TOKEN }}
-          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+        run: npx netlify-cli deploy --prod --dir=build
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
