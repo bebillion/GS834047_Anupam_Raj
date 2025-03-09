@@ -9,4 +9,8 @@ const config: JestConfigWithTsJest = {
   },
 };
 
+module.exports = {
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+};
+
 export default config;
