@@ -4,12 +4,6 @@ import { addSKU, removeSKU } from "../../slices/skuSlice";
 import { RootState } from "../../store";
 import { FaTrash } from "react-icons/fa";
 
-interface SKU {
-  id: number;
-  name: string;
-  price: number;
-  cost: number;
-}
 
 const SKUs: React.FC = () => {
   const [skuName, setSkuName] = useState("");
