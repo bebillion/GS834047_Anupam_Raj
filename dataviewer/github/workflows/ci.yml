@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main  # Runs when code is pushed to main branch
-      - master  # If your main branch is called master
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
   build-and-test:
