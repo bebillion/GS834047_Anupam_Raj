@@ -1,54 +1,65 @@
-# React + TypeScript + Vite
+# Data Viewer App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Instructions
 
-Currently, two official plugins are available:
+### Running the App
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+To start the development server:
+```sh
+npm run dev
+# or
+yarn dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open your browser and navigate to `http://localhost:3000`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Running Tests
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+To run the tests:
+```sh
+npm test
+# or
+yarn test
 ```
+
+## Achievements
+
+### Elements Done Well
+
+1. **Sidebar Navigation with Active State**:
+   - Implemented a sidebar with active state highlighting based on the current route.
+   - Demonstrates proficiency in React Router and conditional styling.
+
+2. **Dynamic Data Handling in Planning Page**:
+   - Utilized AG-Grid for dynamic data handling and editing.
+   - Showcases ability to integrate complex third-party components and manage state effectively.
+
+3. **Chart Visualization**:
+   - Created a chart visualization for planning data using Recharts.
+   - Highlights skills in data visualization and working with chart libraries.
+
+### Why These Elements Demonstrate Proficiency
+
+- **Sidebar Navigation**: Shows understanding of React Router and dynamic class application.
+- **Dynamic Data Handling**: Demonstrates ability to handle complex data structures and integrate advanced UI components.
+- **Chart Visualization**: Illustrates capability to transform data into meaningful visual representations.
+
+## Improvements with More Time
+
+1. **Enhanced Error Handling**:
+   - Implement comprehensive error handling across the application.
+   - Ensures robustness and better user experience.
+
+2. **Unit and Integration Tests**:
+   - Increase test coverage with more unit and integration tests.
+   - Improves reliability and maintainability of the codebase.
+
+3. **Performance Optimization**:
+   - Optimize performance, especially for large datasets in AG-Grid.
+   - Enhances user experience by reducing load times and improving responsiveness.
+
+4. **Responsive Design Enhancements**:
+   - Improve responsive design to ensure a seamless experience across all devices.
+   - Ensures accessibility and usability on mobile and tablet devices.
+
+These improvements would enhance the overall quality, reliability, and user experience of the application.
