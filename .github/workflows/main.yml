@@ -3,7 +3,7 @@ name: Deploy React App to Netlify
 on:
   push:
     branches:
-      - main  # Change if using a different branch
+      - main  # Trigger workflow on push to main branch
 
 jobs:
   deploy:
@@ -16,16 +16,30 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20  # Change to your required Node.js version
+          node-version: 20  # Adjust as needed
 
       - name: Install Dependencies
-        run: cd dataviewer && npm install  # or yarn install
+        run: |
+          cd dataviewer
+          npm ci  # Faster, cleaner install
 
       - name: Build React App
-        run: cd dataviewer && npm run build  # or yarn build
+        run: |
+          cd dataviewer
+          npm run build  # Ensure it generates 'dist' folder
+
+      - name: Debug - Check Build Output
+        run: |
+          cd dataviewer
+          ls -R dist || echo "⚠️ dist folder not found!"
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
 
       - name: Deploy to Netlify
-        run: npx netlify-cli deploy --prod --dir=dist
+        run: |
+          cd dataviewer
+          netlify deploy --prod --dir=dist
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
