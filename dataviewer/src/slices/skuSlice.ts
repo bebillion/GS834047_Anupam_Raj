@@ -31,8 +31,11 @@ export const skuSlice = createSlice({
         state.skus[index] = action.payload;
       }
     },
+    updateSKUOrder: (state, action: PayloadAction<SKU[]>) => {
+      state.skus = action.payload;
+    },
   },
 });
 
-export const { addSKU, removeSKU, updateSKU } = skuSlice.actions;
+export const { addSKU, removeSKU, updateSKU, updateSKUOrder } = skuSlice.actions;
 export default skuSlice.reducer;

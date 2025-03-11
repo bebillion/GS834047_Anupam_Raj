@@ -3,6 +3,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface Store {
   id: number;
   name: string;
+  city: string;
+  state: string;
 }
 
 interface StoreState {
@@ -29,8 +31,11 @@ export const storeSlice = createSlice({
         state.stores[index] = action.payload;
       }
     },
+    updateStoreOrder: (state, action: PayloadAction<Store[]>) => {
+      state.stores = action.payload;
+    },
   },
 });
 
-export const { addStore, removeStore, updateStore } = storeSlice.actions;
+export const { addStore, removeStore, updateStore, updateStoreOrder } = storeSlice.actions;
 export default storeSlice.reducer;

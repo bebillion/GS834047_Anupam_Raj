@@ -1,16 +1,44 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addSKU, removeSKU } from "../../slices/skuSlice";
+import { addSKU, removeSKU, updateSKUOrder } from "../../slices/skuSlice";
 import { RootState } from "../../store";
 import { FaTrash } from "react-icons/fa";
+import { DndContext, closestCenter } from "@dnd-kit/core";
+import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
+// Define the SKURow component
+const SKURow: React.FC<{ sku: SKU; index: number; onRemove: (id: number) => void }> = ({ sku, index, onRemove }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: sku.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} {...attributes} {...listeners} className="cursor-grab border-b">
+      <td className="px-4 py-2 flex items-center gap-2">
+        <span className="cursor-move">☰</span> {index + 1}
+      </td>
+      <td className="px-4 py-2">{sku.name}</td>
+      <td className="px-4 py-2">${sku.price.toFixed(2)}</td>
+      <td className="px-4 py-2">${sku.cost.toFixed(2)}</td>
+      <td className="px-4 py-2 text-center">
+        <button onClick={() => onRemove(sku.id)} className="text-red-500 hover:text-red-700">
+          <FaTrash />
+        </button>
+      </td>
+    </tr>
+  );
+};
 
 const SKUs: React.FC = () => {
   const [skuName, setSkuName] = useState("");
   const [price, setPrice] = useState("");
   const [cost, setCost] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const dispatch = useDispatch();
   const skus = useSelector((state: RootState) => state.skus.skus);
 
@@ -24,34 +52,44 @@ const SKUs: React.FC = () => {
     }
   };
 
+  const handleRemoveSKU = (id: number) => {
+    dispatch(removeSKU(id));
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = skus.findIndex((sku) => sku.id === active.id);
+      const newIndex = skus.findIndex((sku) => sku.id === over.id);
+      const newSkus = arrayMove(skus, oldIndex, newIndex);
+      dispatch(updateSKUOrder(newSkus));
+    }
+  };
+
   return (
     <div className="p-4">
       {/* SKU Table */}
       <div className="overflow-x-auto shadow-md rounded-lg">
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-2"> </th>
-              <th className="px-4 py-2">SKU</th>
-              <th className="px-4 py-2">Price</th>
-              <th className="px-4 py-2">Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {skus.map((sku) => (
-              <tr key={sku.id} className="border-b">
-                <td className="px-4 py-2 text-center">
-                  <button onClick={() => dispatch(removeSKU(sku.id))} className="text-red-500 hover:text-red-700">
-                    <FaTrash />
-                  </button>
-                </td>
-                <td className="px-4 py-2">{sku.name}</td>
-                <td className="px-4 py-2">${sku.price.toFixed(2)}</td>
-                <td className="px-4 py-2">${sku.cost.toFixed(2)}</td>
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-4 py-2">S.No</th>
+                <th className="px-4 py-2">SKU</th>
+                <th className="px-4 py-2">Price</th>
+                <th className="px-4 py-2">Cost</th>
+                <th className="px-4 py-2">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <SortableContext items={skus.map((sku) => sku.id)}>
+              <tbody>
+                {skus.map((sku, index) => (
+                  <SKURow key={sku.id} sku={sku} index={index} onRemove={handleRemoveSKU} />
+                ))}
+              </tbody>
+            </SortableContext>
+          </table>
+        </DndContext>
       </div>
 
       {/* Fixed Add SKU Button */}
