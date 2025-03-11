@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { updatePlanningData } from "../../slices/planningSlice";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { ColDef, CellValueChangedEvent } from "ag-grid-community"; // Import AG-Grid Types
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const Planning: React.FC = () => {
   const stores = useSelector((state: RootState) => state.stores.stores);
@@ -13,8 +16,11 @@ const Planning: React.FC = () => {
   const planningData = useSelector((state: RootState) => state.planning.planning);
   const dispatch = useDispatch();
 
+  const [rowData, setRowData] = useState<PlanningRow[]>([]);
+
   // Define Weeks dynamically
-  const weeks = ["Week 1", "Week 2"];
+  const weeks = ["Week 1", "Week 2", "Week 3", "Week 4"];
+  const months = ["January", "February", "March", "April","May","June","July","August","September","October","November","December"]; // Example months
 
   // Define Interface for Row Data
   interface PlanningRow {
@@ -26,67 +32,89 @@ const Planning: React.FC = () => {
     week: string;
   }
 
-  // Generate row data (cross-join of stores & SKUs)
-  const rowData: PlanningRow[] = stores.flatMap((store) =>
-    skus.map((sku) => {
-      const existingData = planningData.find(
-        (p) => p.storeId === store.id && p.skuId === sku.id
-      );
-      return {
-        storeName: store.name,
-        skuName: sku.name,
-        price: sku.price,
-        cost: sku.cost,
-        salesUnits: existingData?.salesUnits || 0,
-        week: existingData?.week || weeks[0],
-      };
-    })
-  );
+  useEffect(() => {
+    // Generate row data (cross-join of stores & SKUs)
+    const data: PlanningRow[] = stores.flatMap((store) =>
+      skus.flatMap((sku) =>
+        weeks.map((week) => {
+          const existingData = planningData.find(
+            (p) => p.storeId === store.id && p.skuId === sku.id && p.week === week
+          );
+          return {
+            storeName: store.name,
+            skuName: sku.name,
+            price: sku.price,
+            cost: sku.cost,
+            salesUnits: existingData?.salesUnits || 0,
+            week,
+          };
+        })
+      )
+    );
+    setRowData(data);
+  }, [stores, skus, planningData]);
 
   // Column definitions with Type
   const columnDefs: ColDef<PlanningRow>[] = [
     { headerName: "Store", field: "storeName", pinned: "left" },
     { headerName: "SKU", field: "skuName", pinned: "left" },
-    {
-      headerName: "Sales Units",
-      field: "salesUnits",
-      editable: true,
-      valueParser: (params) => Number(params.newValue) || 0,
-    },
-    {
-      headerName: "Sales $",
-      valueGetter: (params) =>
-        params.data ? params.data.salesUnits * params.data.price : 0,
-      valueFormatter: (params) =>
-        `$${((params.value as number) || 0).toFixed(2)}`,
-    },
-    {
-      headerName: "GM $",
-      valueGetter: (params) =>
-        params.data
-          ? params.data.salesUnits * (params.data.price - params.data.cost)
-          : 0,
-      valueFormatter: (params) =>
-        `$${((params.value as number) || 0).toFixed(2)}`,
-    },
-    {
-      headerName: "GM %",
-      valueGetter: (params) => {
-        if (!params.data) return 0;
-        const salesDollars = params.data.salesUnits * params.data.price;
-        const gmDollars =
-          params.data.salesUnits * (params.data.price - params.data.cost);
-        return salesDollars > 0 ? (gmDollars / salesDollars) * 100 : 0;
-      },
-      valueFormatter: (params) => `${((params.value as number) || 0).toFixed(2)}%`,
-      cellStyle: (params) => {
-        const value = (params.value as number) || 0;
-        if (value >= 40) return { backgroundColor: "green", color: "white" };
-        if (value >= 10) return { backgroundColor: "yellow", color: "black" };
-        if (value >= 5) return { backgroundColor: "orange", color: "black" };
-        return { backgroundColor: "red", color: "white" };
-      },
-    },
+    ...months.flatMap((month) =>
+      weeks.map((week) => ({
+        headerName: `${month} ${week}`,
+        children: [
+          {
+            headerName: "Sales Units",
+            field: `${month}_${week}_salesUnits`,
+            editable: true,
+            valueParser: (params) => Number(params.newValue) || 0,
+            valueGetter: (params) => {
+              const data = planningData.find(
+                (p) =>
+                  p.storeId === params.data.storeId &&
+                  p.skuId === params.data.skuId &&
+                  p.week === week
+              );
+              return data ? data.salesUnits : 0;
+            },
+          },
+          {
+            headerName: "Sales $",
+            valueGetter: (params) =>
+              params.data ? params.data.salesUnits * params.data.price : 0,
+            valueFormatter: (params) =>
+              `$${((params.value as number) || 0).toFixed(2)}`,
+          },
+          {
+            headerName: "GM $",
+            valueGetter: (params) =>
+              params.data
+                ? params.data.salesUnits * (params.data.price - params.data.cost)
+                : 0,
+            valueFormatter: (params) =>
+              `$${((params.value as number) || 0).toFixed(2)}`,
+          },
+          {
+            headerName: "GM %",
+            valueGetter: (params) => {
+              if (!params.data) return 0;
+              const salesDollars = params.data.salesUnits * params.data.price;
+              const gmDollars =
+                params.data.salesUnits * (params.data.price - params.data.cost);
+              return salesDollars > 0 ? (gmDollars / salesDollars) * 100 : 0;
+            },
+            valueFormatter: (params) =>
+              `${((params.value as number) || 0).toFixed(2)}%`,
+            cellStyle: (params) => {
+              const value = (params.value as number) || 0;
+              if (value >= 40) return { backgroundColor: "green", color: "white" };
+              if (value >= 10) return { backgroundColor: "yellow", color: "black" };
+              if (value >= 5) return { backgroundColor: "orange", color: "black" };
+              return { backgroundColor: "red", color: "white" };
+            },
+          },
+        ],
+      }))
+    ),
   ];
 
   // Handle Cell Edit with Proper Type
