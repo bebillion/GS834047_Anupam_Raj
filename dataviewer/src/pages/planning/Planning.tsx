@@ -24,6 +24,8 @@ const Planning: React.FC = () => {
 
   // Define Interface for Row Data
   interface PlanningRow {
+    storeId: number; // Add this line
+    skuId: number; // Add this line
     storeName: string;
     skuName: string;
     price: number;
@@ -41,6 +43,8 @@ const Planning: React.FC = () => {
             (p) => p.storeId === store.id && p.skuId === sku.id && p.week === week
           );
           return {
+            storeId: store.id, // Add this line
+            skuId: sku.id, // Add this line
             storeName: store.name,
             skuName: sku.name,
             price: sku.price,
@@ -66,8 +70,8 @@ const Planning: React.FC = () => {
             headerName: "Sales Units",
             field: `${month}_${week}_salesUnits`,
             editable: true,
-            valueParser: (params) => Number(params.newValue) || 0,
-            valueGetter: (params) => {
+            valueParser: (params: { newValue: string }) => Number(params.newValue) || 0,
+            valueGetter: (params: { data: PlanningRow }) => {
               const data = planningData.find(
                 (p) =>
                   p.storeId === params.data.storeId &&
@@ -79,32 +83,32 @@ const Planning: React.FC = () => {
           },
           {
             headerName: "Sales $",
-            valueGetter: (params) =>
+            valueGetter: (params: { data: PlanningRow }) =>
               params.data ? params.data.salesUnits * params.data.price : 0,
-            valueFormatter: (params) =>
+            valueFormatter: (params: { value: number }) =>
               `$${((params.value as number) || 0).toFixed(2)}`,
           },
           {
             headerName: "GM $",
-            valueGetter: (params) =>
+            valueGetter: (params: { data: PlanningRow }) =>
               params.data
                 ? params.data.salesUnits * (params.data.price - params.data.cost)
                 : 0,
-            valueFormatter: (params) =>
+            valueFormatter: (params: { value: number }) =>
               `$${((params.value as number) || 0).toFixed(2)}`,
           },
           {
             headerName: "GM %",
-            valueGetter: (params) => {
+            valueGetter: (params: { data: PlanningRow }) => {
               if (!params.data) return 0;
               const salesDollars = params.data.salesUnits * params.data.price;
               const gmDollars =
                 params.data.salesUnits * (params.data.price - params.data.cost);
               return salesDollars > 0 ? (gmDollars / salesDollars) * 100 : 0;
             },
-            valueFormatter: (params) =>
+            valueFormatter: (params: { value: number }) =>
               `${((params.value as number) || 0).toFixed(2)}%`,
-            cellStyle: (params) => {
+            cellStyle: (params: { value: number }) => {
               const value = (params.value as number) || 0;
               if (value >= 40) return { backgroundColor: "green", color: "white" };
               if (value >= 10) return { backgroundColor: "yellow", color: "black" };

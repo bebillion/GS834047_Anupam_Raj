@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { addStore, removeStore, updateStore, updateStoreOrder } from "../../slices/storeSlice";
+import { addStore, removeStore, updateStoreOrder } from "../../slices/storeSlice";
 
 interface Store {
   id: number;
@@ -52,9 +52,9 @@ const Stores: React.FC = () => {
     dispatch(removeStore(id));
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (over && active.id !== over.id) {
       const oldIndex = stores.findIndex((store) => store.id === active.id);
       const newIndex = stores.findIndex((store) => store.id === over.id);
       const newStores = arrayMove(stores, oldIndex, newIndex);

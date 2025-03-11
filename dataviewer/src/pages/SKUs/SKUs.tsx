@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addSKU, removeSKU, updateSKUOrder } from "../../slices/skuSlice";
 import { RootState } from "../../store";
 import { FaTrash } from "react-icons/fa";
-import { DndContext, closestCenter } from "@dnd-kit/core";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -64,11 +64,11 @@ const SKUs: React.FC = () => {
     dispatch(removeSKU(id));
   };
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (active.id !== over?.id) {
       const oldIndex = skus.findIndex((sku) => sku.id === active.id);
-      const newIndex = skus.findIndex((sku) => sku.id === over.id);
+      const newIndex = skus.findIndex((sku) => sku.id === over?.id);
       const newSkus = arrayMove(skus, oldIndex, newIndex);
       dispatch(updateSKUOrder(newSkus));
     }
