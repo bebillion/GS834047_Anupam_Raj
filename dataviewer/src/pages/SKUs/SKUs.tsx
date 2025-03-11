@@ -7,6 +7,14 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+// Define the SKU type
+type SKU = {
+  id: number;
+  name: string;
+  price: number;
+  cost: number;
+};
+
 // Define the SKURow component
 const SKURow: React.FC<{ sku: SKU; index: number; onRemove: (id: number) => void }> = ({ sku, index, onRemove }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: sku.id });
